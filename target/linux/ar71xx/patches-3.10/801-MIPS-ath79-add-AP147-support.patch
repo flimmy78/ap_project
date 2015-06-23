@@ -1,0 +1,388 @@
+diff -Nuar a/arch/mips/ath79/clock.c b/arch/mips/ath79/clock.c
+--- a/arch/mips/ath79/clock.c	2015-06-19 16:22:09.000000000 +0800
++++ b/arch/mips/ath79/clock.c	2015-06-19 16:47:39.000000000 +0800
+@@ -302,9 +302,11 @@
+ 	u32 bootstrap;
+ 
+ 	bootstrap = ath79_reset_rr(QCA953X_RESET_REG_BOOTSTRAP);
++/**
+ 	if (bootstrap &	QCA953X_BOOTSTRAP_REF_CLK_40)
+ 		ath79_ref_clk.rate = 40 * 1000 * 1000;
+ 	else
++**/
+ 		ath79_ref_clk.rate = 25 * 1000 * 1000;
+ 
+ 	pll = ath79_pll_rr(QCA953X_PLL_CPU_CONFIG_REG);
+diff -Nuar a/arch/mips/ath79/common.c b/arch/mips/ath79/common.c
+--- a/arch/mips/ath79/common.c	2015-06-19 16:22:09.000000000 +0800
++++ b/arch/mips/ath79/common.c	2015-06-19 16:47:39.000000000 +0800
+@@ -133,6 +133,8 @@
+ 		reg = AR933X_RESET_REG_RESET_MODULE;
+ 	else if (soc_is_ar934x())
+ 		reg = AR934X_RESET_REG_RESET_MODULE;
++	else if (soc_is_qca953x())
++		reg = QCA953X_RESET_REG_RESET_MODULE;
+ 	else
+ 		BUG();
+ 
+diff -Nuar a/arch/mips/ath79/dev-eth.c b/arch/mips/ath79/dev-eth.c
+--- a/arch/mips/ath79/dev-eth.c	2015-06-19 16:22:09.000000000 +0800
++++ b/arch/mips/ath79/dev-eth.c	2015-06-19 16:47:39.000000000 +0800
+@@ -197,6 +197,7 @@
+ 	case ATH79_SOC_AR7241:
+ 	case ATH79_SOC_AR9330:
+ 	case ATH79_SOC_AR9331:
++	case ATH79_SOC_QCA9531:
+ 	case ATH79_SOC_QCA9533:
+ 		mdio_dev = &ath79_mdio1_device;
+ 		mdio_data = &ath79_mdio1_data;
+@@ -254,7 +255,8 @@
+ 		}
+ 		mdio_data->is_ar934x = 1;
+ 		break;
+-
++		
++	case ATH79_SOC_QCA9531:
+ 	case ATH79_SOC_QCA9533:
+ 		mdio_data->builtin_switch = 1;
+ 		break;
+@@ -568,6 +570,7 @@
+ 	case ATH79_SOC_AR9341:
+ 	case ATH79_SOC_AR9342:
+ 	case ATH79_SOC_AR9344:
++	case ATH79_SOC_QCA9531:
+ 	case ATH79_SOC_QCA9533:
+ 	case ATH79_SOC_QCA9556:
+ 	case ATH79_SOC_QCA9558:
+@@ -626,6 +629,7 @@
+ 		case ATH79_SOC_AR7241:
+ 		case ATH79_SOC_AR9330:
+ 		case ATH79_SOC_AR9331:
++		case ATH79_SOC_QCA9531:
+ 		case ATH79_SOC_QCA9533:
+ 			pdata->phy_if_mode = PHY_INTERFACE_MODE_MII;
+ 			break;
+@@ -687,6 +691,7 @@
+ 		case ATH79_SOC_AR7241:
+ 		case ATH79_SOC_AR9330:
+ 		case ATH79_SOC_AR9331:
++		case ATH79_SOC_QCA9531:
+ 		case ATH79_SOC_QCA9533:
+ 			pdata->phy_if_mode = PHY_INTERFACE_MODE_GMII;
+ 			break;
+@@ -991,6 +996,7 @@
+ 			pdata->fifo_cfg3 = 0x01f00140;
+ 		break;
+ 
++	case ATH79_SOC_QCA9531:
+ 	case ATH79_SOC_QCA9533:
+ 		if (id == 0) {
+ 			pdata->reset_bit = AR933X_RESET_GE0_MAC |
+@@ -1096,6 +1102,7 @@
+ 		case ATH79_SOC_AR7241:
+ 		case ATH79_SOC_AR9330:
+ 		case ATH79_SOC_AR9331:
++		case ATH79_SOC_QCA9531:
+ 		case ATH79_SOC_QCA9533:
+ 			pdata->mii_bus_dev = &ath79_mdio1_device.dev;
+ 			break;
+diff -Nuar a/arch/mips/ath79/dev-wmac.c b/arch/mips/ath79/dev-wmac.c
+--- a/arch/mips/ath79/dev-wmac.c	2015-06-19 16:22:09.000000000 +0800
++++ b/arch/mips/ath79/dev-wmac.c	2015-06-19 16:47:39.000000000 +0800
+@@ -157,8 +157,8 @@
+ 
+ 	ath79_wmac_resources[0].start = QCA953X_WMAC_BASE;
+ 	ath79_wmac_resources[0].end = QCA953X_WMAC_BASE + QCA953X_WMAC_SIZE - 1;
+-	ath79_wmac_resources[1].start = ATH79_CPU_IRQ(2);
+-	ath79_wmac_resources[1].end = ATH79_CPU_IRQ(2);
++	ath79_wmac_resources[1].start = ATH79_IP2_IRQ(1);
++	ath79_wmac_resources[1].start = ATH79_IP2_IRQ(1);
+ 
+ 	t = ath79_reset_rr(QCA953X_RESET_REG_BOOTSTRAP);
+ 	if (t & QCA953X_BOOTSTRAP_REF_CLK_40)
+@@ -280,7 +280,7 @@
+ 	u8 mac[6] = { 0x00, 0x02, 0x03, 0x04, 0x05, 0x06 };
+ 	int mac_start = 2, mac_end = 8;
+ 
+-	BUG_ON(!soc_is_ar933x() && !soc_is_ar934x());
++	BUG_ON(!soc_is_ar933x() && !soc_is_ar934x() && !soc_is_qca953x());
+ 	base = ioremap_nocache(AR933X_WMAC_BASE, AR933X_WMAC_SIZE);
+ 	while (addr > sizeof(hdr)) {
+ 		if (!ar93xx_wmac_otp_read(base, addr, hdr, sizeof(hdr)))
+diff -Nuar a/arch/mips/ath79/early_printk.c b/arch/mips/ath79/early_printk.c
+--- a/arch/mips/ath79/early_printk.c	2015-06-19 16:22:09.000000000 +0800
++++ b/arch/mips/ath79/early_printk.c	2015-06-19 16:47:39.000000000 +0800
+@@ -114,6 +114,8 @@
+ 	case REV_ID_MAJOR_AR9341:
+ 	case REV_ID_MAJOR_AR9342:
+ 	case REV_ID_MAJOR_AR9344:
++	case REV_ID_MAJOR_QCA9531_V1:
++	case REV_ID_MAJOR_QCA9531_V2:
+ 	case REV_ID_MAJOR_QCA9533:
+ 	case REV_ID_MAJOR_QCA9556:
+ 	case REV_ID_MAJOR_QCA9558:
+diff -Nuar a/arch/mips/ath79/irq.c b/arch/mips/ath79/irq.c
+--- a/arch/mips/ath79/irq.c	2015-06-19 16:22:09.000000000 +0800
++++ b/arch/mips/ath79/irq.c	2015-06-19 16:47:39.000000000 +0800
+@@ -154,6 +154,39 @@
+ 	irq_set_chained_handler(ATH79_CPU_IRQ(2), ar934x_ip2_irq_dispatch);
+ }
+ 
++static void qca953x_ip2_irq_dispatch(unsigned int irq, struct irq_desc *desc)
++{
++	u32 status;
++
++	disable_irq_nosync(irq);
++
++	status = ath79_reset_rr(QCA953X_RESET_REG_PCIE_WMAC_INT_STATUS);
++
++	if (status & QCA953X_PCIE_WMAC_INT_PCIE_ALL) {
++		ath79_ddr_wb_flush(QCA953X_DDR_REG_FLUSH_PCIE);
++		generic_handle_irq(ATH79_IP2_IRQ(0));
++	} else if (status & QCA953X_PCIE_WMAC_INT_WMAC_ALL) {
++		ath79_ddr_wb_flush(QCA953X_DDR_REG_FLUSH_WMAC);
++		generic_handle_irq(ATH79_IP2_IRQ(1));
++	} else {
++		spurious_interrupt();
++	}
++
++	enable_irq(irq);
++}
++
++static void qca953x_irq_init(void)
++{
++	int i;
++
++	for (i = ATH79_IP2_IRQ_BASE;
++	     i < ATH79_IP2_IRQ_BASE + ATH79_IP2_IRQ_COUNT; i++)
++		irq_set_chip_and_handler(i, &dummy_irq_chip,
++					 handle_level_irq);
++
++	irq_set_chained_handler(ATH79_CPU_IRQ(2), qca953x_ip2_irq_dispatch);
++}
++
+ static void qca955x_ip2_irq_dispatch(unsigned int irq, struct irq_desc *desc)
+ {
+ 	u32 status;
+@@ -369,6 +402,8 @@
+ 
+ 	if (soc_is_ar934x())
+ 		ar934x_ip2_irq_init();
++	else if (soc_is_qca953x())
++		qca953x_irq_init();
+ 	else if (soc_is_qca955x())
+ 		qca955x_irq_init();
+ }
+diff -Nuar a/arch/mips/ath79/Kconfig b/arch/mips/ath79/Kconfig
+--- a/arch/mips/ath79/Kconfig	2015-06-19 16:22:09.000000000 +0800
++++ b/arch/mips/ath79/Kconfig	2015-06-19 16:47:39.000000000 +0800
+@@ -104,6 +104,20 @@
+ 	  Say 'Y' here if you want your kernel to support the
+ 	  Atheros AP136 or AP135 reference boards.
+ 
++config ATH79_MACH_AP147
++	bool "Atheros AP147 reference board"
++	select SOC_QCA953X
++        select ATH79_DEV_GPIO_BUTTONS
++        select ATH79_DEV_LEDS_GPIO
++        select ATH79_DEV_SPI
++        select ATH79_DEV_USB
++        select ATH79_DEV_WMAC
++        select ATH79_DEV_ETH
++        select ATH79_DEV_M25P80
++        help
++          Say 'Y' here if you want your kernel to support the
++          Atheros AP147 reference board.
++
+ config ATH79_MACH_AP81
+ 	bool "Atheros AP81 reference board"
+ 	select SOC_AR913X
+diff -Nuar a/arch/mips/ath79/machtypes.h b/arch/mips/ath79/machtypes.h
+--- a/arch/mips/ath79/machtypes.h	2015-06-19 16:22:09.000000000 +0800
++++ b/arch/mips/ath79/machtypes.h	2015-06-19 16:47:39.000000000 +0800
+@@ -28,6 +28,7 @@
+ 	ATH79_MACH_AP135_020,		/* Atheros AP135-020 reference board */
+ 	ATH79_MACH_AP136_010,		/* Atheros AP136-010 reference board */
+ 	ATH79_MACH_AP136_020,		/* Atheros AP136-020 reference board */
++	ATH79_MACH_AP147,		/* Atheros AP147 reference board */
+ 	ATH79_MACH_AP81,		/* Atheros AP81 reference board */
+ 	ATH79_MACH_AP83,		/* Atheros AP83 */
+ 	ATH79_MACH_AP96,		/* Atheros AP96 */
+diff -Nuar a/arch/mips/ath79/Makefile b/arch/mips/ath79/Makefile
+--- a/arch/mips/ath79/Makefile	2015-06-19 16:22:09.000000000 +0800
++++ b/arch/mips/ath79/Makefile	2015-06-19 16:47:39.000000000 +0800
+@@ -46,6 +46,7 @@
+ obj-$(CONFIG_ATH79_MACH_AP121)		+= mach-ap121.o
+ obj-$(CONFIG_ATH79_MACH_AP132)		+= mach-ap132.o
+ obj-$(CONFIG_ATH79_MACH_AP136)		+= mach-ap136.o
++obj-$(CONFIG_ATH79_MACH_AP147)		+= mach-ap147.o
+ obj-$(CONFIG_ATH79_MACH_AP81)		+= mach-ap81.o
+ obj-$(CONFIG_ATH79_MACH_AP83)		+= mach-ap83.o
+ obj-$(CONFIG_ATH79_MACH_AP96)		+= mach-ap96.o
+diff -Nuar a/arch/mips/ath79/pci.c b/arch/mips/ath79/pci.c
+--- a/arch/mips/ath79/pci.c	2015-06-19 16:22:09.000000000 +0800
++++ b/arch/mips/ath79/pci.c	2015-06-19 16:47:39.000000000 +0800
+@@ -68,6 +68,14 @@
+ 	},
+ };
+ 
++static const struct ath79_pci_irq qca953x_pci_irq_map[] __initconst = {
++	{
++		.bus	= 0,
++		.slot	= 0,
++		.pin	= 1,
++		.irq	= ATH79_PCI_IRQ(0),
++	}
++};
+ int __init pcibios_map_irq(const struct pci_dev *dev, uint8_t slot, uint8_t pin)
+ {
+ 	int irq = -1;
+@@ -86,6 +94,9 @@
+ 		} else if (soc_is_qca955x()) {
+ 			ath79_pci_irq_map = qca955x_pci_irq_map;
+ 			ath79_pci_nr_irqs = ARRAY_SIZE(qca955x_pci_irq_map);
++		} else if (soc_is_qca953x()) {
++			ath79_pci_irq_map = qca953x_pci_irq_map;
++			ath79_pci_nr_irqs = ARRAY_SIZE(qca953x_pci_irq_map);
+ 		} else {
+ 			pr_crit("pci %s: invalid irq map\n",
+ 				pci_name((struct pci_dev *) dev));
+@@ -303,6 +314,15 @@
+ 						 QCA955X_PCI_MEM_SIZE,
+ 						 1,
+ 						 ATH79_IP3_IRQ(2));
++	} else if (soc_is_qca953x()) {
++		pdev = ath79_register_pci_ar724x(0,
++						 QCA953X_PCI_CFG_BASE0,
++						 QCA953X_PCI_CTRL_BASE0,
++						 QCA953X_PCI_CRP_BASE0,
++						 QCA953X_PCI_MEM_BASE0,
++						 QCA953X_PCI_MEM_SIZE,
++						 0,
++						 ATH79_IP2_IRQ(0));
+ 	} else {
+ 		/* No PCI support */
+ 		return -ENODEV;
+diff -Nuar a/arch/mips/ath79/setup.c b/arch/mips/ath79/setup.c
+--- a/arch/mips/ath79/setup.c	2015-06-19 16:22:09.000000000 +0800
++++ b/arch/mips/ath79/setup.c	2015-06-19 16:47:39.000000000 +0800
+@@ -152,6 +152,15 @@
+ 		rev = id & AR934X_REV_ID_REVISION_MASK;
+ 		break;
+ 
++	case REV_ID_MAJOR_QCA9531_V1:
++	case REV_ID_MAJOR_QCA9531_V2:
++		ath79_soc = ATH79_SOC_QCA9531;
++		chip = "9531";
++		rev = id & QCA953X_REV_ID_REVISION_MASK;
++		if (major == REV_ID_MAJOR_QCA9531_V2)
++			rev = 2;
++		break;
++
+ 	case REV_ID_MAJOR_QCA9533:
+ 		ath79_soc = ATH79_SOC_QCA9533;
+ 		chip = "9533";
+diff -Nuar a/arch/mips/include/asm/mach-ath79/ar71xx_regs.h b/arch/mips/include/asm/mach-ath79/ar71xx_regs.h
+--- a/arch/mips/include/asm/mach-ath79/ar71xx_regs.h	2015-06-19 16:49:29.000000000 +0800
++++ b/arch/mips/include/asm/mach-ath79/ar71xx_regs.h	2015-06-19 16:47:39.000000000 +0800
+@@ -109,6 +109,12 @@
+ #define QCA953X_WMAC_BASE	(AR71XX_APB_BASE + 0x00100000)
+ #define QCA953X_WMAC_SIZE	0x20000
+ 
++#define QCA953X_PCI_CFG_BASE0	0x14000000
++#define QCA953X_PCI_CTRL_BASE0	(AR71XX_APB_BASE + 0x000f0000)
++#define QCA953X_PCI_CRP_BASE0	(AR71XX_APB_BASE + 0x000c0000)
++#define QCA953X_PCI_MEM_BASE0	0x10000000
++#define QCA953X_PCI_MEM_SIZE	0x02000000
++
+ #define QCA955X_PCI_MEM_BASE0	0x10000000
+ #define QCA955X_PCI_MEM_BASE1	0x12000000
+ #define QCA955X_PCI_MEM_SIZE	0x02000000
+@@ -177,6 +183,12 @@
+ #define AR934X_DDR_REG_FLUSH_PCIE	0xa8
+ #define AR934X_DDR_REG_FLUSH_WMAC	0xac
+ 
++#define QCA953X_DDR_REG_FLUSH_GE0	0x9c
++#define QCA953X_DDR_REG_FLUSH_GE1	0xa0
++#define QCA953X_DDR_REG_FLUSH_USB	0xa4
++#define QCA953X_DDR_REG_FLUSH_PCIE	0xa8
++#define QCA953X_DDR_REG_FLUSH_WMAC	0xac
++
+ /*
+  * PLL block
+  */
+@@ -398,7 +410,7 @@
+ 
+ #define QCA953X_RESET_REG_RESET_MODULE		0x1c
+ #define QCA953X_RESET_REG_BOOTSTRAP		0xb0
+-#define QCA953X_RESET_REG_EXT_INT_STATUS	0xac
++#define QCA953X_RESET_REG_PCIE_WMAC_INT_STATUS	0xac
+ 
+ #define QCA955X_RESET_REG_RESET_MODULE		0x1c
+ #define QCA955X_RESET_REG_BOOTSTRAP		0xb0
+@@ -570,6 +582,24 @@
+ 	 AR934X_PCIE_WMAC_INT_PCIE_RC1 | AR934X_PCIE_WMAC_INT_PCIE_RC2 | \
+ 	 AR934X_PCIE_WMAC_INT_PCIE_RC3)
+ 
++#define QCA953X_PCIE_WMAC_INT_WMAC_MISC		BIT(0)
++#define QCA953X_PCIE_WMAC_INT_WMAC_TX		BIT(1)
++#define QCA953X_PCIE_WMAC_INT_WMAC_RXLP		BIT(2)
++#define QCA953X_PCIE_WMAC_INT_WMAC_RXHP		BIT(3)
++#define QCA953X_PCIE_WMAC_INT_PCIE_RC		BIT(4)
++#define QCA953X_PCIE_WMAC_INT_PCIE_RC0		BIT(5)
++#define QCA953X_PCIE_WMAC_INT_PCIE_RC1		BIT(6)
++#define QCA953X_PCIE_WMAC_INT_PCIE_RC2		BIT(7)
++#define QCA953X_PCIE_WMAC_INT_PCIE_RC3		BIT(8)
++#define QCA953X_PCIE_WMAC_INT_WMAC_ALL \
++	(QCA953X_PCIE_WMAC_INT_WMAC_MISC | QCA953X_PCIE_WMAC_INT_WMAC_TX | \
++	 QCA953X_PCIE_WMAC_INT_WMAC_RXLP | QCA953X_PCIE_WMAC_INT_WMAC_RXHP)
++
++#define QCA953X_PCIE_WMAC_INT_PCIE_ALL \
++	(QCA953X_PCIE_WMAC_INT_PCIE_RC | QCA953X_PCIE_WMAC_INT_PCIE_RC0 | \
++	 QCA953X_PCIE_WMAC_INT_PCIE_RC1 | QCA953X_PCIE_WMAC_INT_PCIE_RC2 | \
++	 QCA953X_PCIE_WMAC_INT_PCIE_RC3)
++ 
+ #define QCA955X_EXT_INT_WMAC_MISC		BIT(0)
+ #define QCA955X_EXT_INT_WMAC_TX			BIT(1)
+ #define QCA955X_EXT_INT_WMAC_RXLP		BIT(2)
+@@ -612,6 +642,8 @@
+ #define REV_ID_MAJOR_AR9341		0x0120
+ #define REV_ID_MAJOR_AR9342		0x1120
+ #define REV_ID_MAJOR_AR9344		0x2120
++#define REV_ID_MAJOR_QCA9531_V1		0x0150
++#define REV_ID_MAJOR_QCA9531_V2		0x0160
+ #define REV_ID_MAJOR_QCA9533		0x0140
+ #define REV_ID_MAJOR_QCA9556		0x0130
+ #define REV_ID_MAJOR_QCA9558		0x1130
+diff -Nuar a/arch/mips/include/asm/mach-ath79/ath79.h b/arch/mips/include/asm/mach-ath79/ath79.h
+--- a/arch/mips/include/asm/mach-ath79/ath79.h	2015-06-19 16:49:29.000000000 +0800
++++ b/arch/mips/include/asm/mach-ath79/ath79.h	2015-06-19 16:47:39.000000000 +0800
+@@ -32,6 +32,7 @@
+ 	ATH79_SOC_AR9341,
+ 	ATH79_SOC_AR9342,
+ 	ATH79_SOC_AR9344,
++	ATH79_SOC_QCA9531,
+ 	ATH79_SOC_QCA9533,
+ 	ATH79_SOC_QCA9556,
+ 	ATH79_SOC_QCA9558,
+@@ -101,6 +102,11 @@
+ 	return soc_is_ar9341() || soc_is_ar9342() || soc_is_ar9344();
+ }
+ 
++static inline int soc_is_qca9531(void)
++{
++	return ath79_soc == ATH79_SOC_QCA9531;
++}
++
+ static inline int soc_is_qca9533(void)
+ {
+ 	return ath79_soc == ATH79_SOC_QCA9533;
+@@ -108,7 +114,7 @@
+ 
+ static inline int soc_is_qca953x(void)
+ {
+-	return soc_is_qca9533();
++	return soc_is_qca9533() || soc_is_qca9531();
+ }
+ 
+ static inline int soc_is_qca9556(void)
