@@ -175,6 +175,12 @@ $(call Package/libc/Default)
   TITLE:=POSIX thread library debugging support
 endef
 
+define Package/libubacktrace
+	$(call Package/libc/Default)
+	DEPENDS:=@USE_UCLIBC
+	TITLE:=Backtrace functions library
+endef
+
 define Package/librt
 $(call Package/libc/Default)
   TITLE:=POSIX.1b RealTime extension library
@@ -478,6 +484,16 @@ ifeq ($(CONFIG_EXTERNAL_TOOLCHAIN),)
   endif
   endef
 
+  define Package/libubacktrace/install
+	$(INSTALL_DIR) $(1)/lib
+  ifeq ($(CONFIG_USE_UCLIBC),y)
+	$(CP) \
+		$(TOOLCHAIN_DIR)/lib/libubacktrace.so.* \
+		$(TOOLCHAIN_DIR)/lib/libubacktrace-$(LIBC_SO_VERSION).so \
+		$(1)/lib/
+  endif
+  endef
+
   define Package/libpthread/install_lib
 	$(if $(wildcard $(TOOLCHAIN_DIR)/lib/libpthread_so.a),$(CP) $(TOOLCHAIN_DIR)/lib/libpthread_so.a $(1)/lib/libpthread_pic.a)
   endef
@@ -592,6 +608,7 @@ $(eval $(call BuildPackage,libssp))
 $(eval $(call BuildPackage,libstdcpp))
 $(eval $(call BuildPackage,libpthread))
 $(eval $(call BuildPackage,libthread-db))
+$(eval $(call BuildPackage,libubacktrace))
 $(eval $(call BuildPackage,librt))
 $(eval $(call BuildPackage,libgfortran))
 $(eval $(call BuildPackage,ldd))
