@@ -1,18 +1,19 @@
+
 #!/bin/bash
 
 main() {
-	local f=$1
-	shift
+        local f=$1
+        shift
 
-	local count=$#
+        local count=$#
 
-	for ((i=1; i<=$count; i++)); do
-		if [ "$f" = "$1" ]; then
-			echo "$i"
-			break
-		fi
-		shift
-	done
+        for ((i=1; i<=$count; i++)); do
+                if [ "$f" = "$1" ]; then
+                        echo "$i"
+                        break
+                fi
+                shift
+        done
 }
 
 main $*
