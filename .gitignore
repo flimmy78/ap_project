@@ -8,7 +8,7 @@
 /staging_dir
 /tmp
 /logs
-/feeds
+#/feeds
 /feeds.conf
 #/files
 /package/feeds
