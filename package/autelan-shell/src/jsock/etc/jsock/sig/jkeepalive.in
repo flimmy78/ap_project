@@ -18,14 +18,12 @@ readonly file_jkeepalive_state=/tmp/.jkeepalive_state
 
 keepalive_nok() {
 	set_file_value ${file_jkeepalive_state} nok
-	sysalarm on &
-	/usr/sbin/stimer_keepalive_nok.sh &>/dev/null
+	/usr/sbin/jkeepalive_nok.sh &>/dev/null
 }
 
 keepalive_ok() {
 	set_file_value ${file_jkeepalive_state} ok
-	sysalarm off &
-	/usr/sbin/stimer_keepalive_ok.sh &>/dev/null
+	/usr/sbin/jkeepalive_ok.sh &>/dev/null
 }
 
 keepalive_send() {

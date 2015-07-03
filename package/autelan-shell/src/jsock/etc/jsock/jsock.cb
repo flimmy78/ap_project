@@ -217,7 +217,8 @@ jcmd_cb() {
 		# exec syn command
 		#
 		local err=0
-		local tmp=$( (${name} ${args}) 2>&1 ); errno=$?
+		local tmp
+		tmp=$( (${name} ${args}) 2>&1 ); errno=$?
 		if ((0==errno)); then
 			stdout=${tmp}
 			jcmd_logger "${name} ${args} stdout:${stdout}"
