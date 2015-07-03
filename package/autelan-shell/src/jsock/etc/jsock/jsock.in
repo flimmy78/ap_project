@@ -13,7 +13,7 @@ JSOCK_PROTOCOL=${JSOCK_PROTOCOL:-tcp}
 JSOCK_TIMEOUT=${JSOCK_TIMEOUT:-3}
 
 JSOCK_PEER=$(get_file_value ${__ROOTFS__}/etc/peer ${PEER})
-file_jsock_peer_state=/tmp/.jsock_peer_state
+file_jsock_peer_state=/tmp/.jkeepalive_state
 
 readonly list_jsock_mode="asyn ack syn"
 readonly list_jsock_type="sig msg cmd"
