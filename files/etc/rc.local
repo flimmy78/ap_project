@@ -5,6 +5,6 @@
 mkdir /tmp/tftp
 
 # stimerd
-/usr/bin/stimerd
+/usr/bin/stimerd &
 
 exit 0
