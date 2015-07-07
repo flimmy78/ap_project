@@ -348,7 +348,6 @@ mac80211_generate_mac() {
         local ref="$(mac80211_generate_mac_autelan $mac_num $macaddr $(cat /sys/class/ieee80211/${phy}/address_mask))"
         #add end   by autelan
         local mask="$(cat /sys/class/ieee80211/${phy}/address_mask)"
-        echo "macaddr:${macaddr};ref:${ref}" >>/tmp/guoshuai
         [ "$mask" = "00:00:00:00:00:00" ] && mask="ff:ff:ff:ff:ff:ff";
         local oIFS="$IFS"; IFS=":"; set -- $mask; IFS="$oIFS"
 
