@@ -2,6 +2,26 @@
 
 START=99
 
+add_timer() {
+        local name="$1"
+        local delay="$2"
+        local interval="$3"; shift 3
+        local command="$*"
+        local err=0
+
+        stimerc insert "${name}" "${delay}" "${interval}" 0 "TZ=UTC-8 ${command}"; err=$?
+        if ((0!=err)); then
+                echo "insert timer ${name} error:${err}"
+        fi
+
+        return ${err}
+}
+
+add_timers() {
+	add_timer jkeepalive     0 10 "/etc/jsock/sig/jkeepalive.sh 1>/dev/null"
+
+}
+
 kes_service() {
 
 	echo "**************** insmod kes.ko"
@@ -32,16 +52,18 @@ check_upgrade_flag()
 
 }
 
+
+
 start() {
 	local err=0
 	#kes_service
+	add_timers
 	
 	/usr/bin/partool -part mtd2 -new system.state ok; err=$?
 	[[ ${err} -ne 0 ]] && /usr/bin/partool -part mtd2 -empty
 	/usr/bin/partool -part mtd2 -new system.failed_count 0; err=$?
 	[[ ${err} -ne 0 ]] && /usr/bin/partool -part mtd2 -empty	
 
-	check_upgrade_flag
-	
+	#check_upgrade_flag
 	
 }
