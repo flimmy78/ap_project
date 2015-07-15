@@ -1,0 +1,17 @@
+
+config wifi-device  radio1
+        option type     mac80211
+	option country  'US'
+        option channel  36
+        option hwmode   11an
+	option path 'pci0000:00/0000:00:00.0'
+        option htmode   HT20
+        # REMOVE THIS LINE TO ENABLE WIFI:
+        # option disabled 1
+
+config wifi-iface
+	option device radio1
+	option network v2
+	option mode ap
+	option ssid 'config.9797168.com'
+        option encryption none

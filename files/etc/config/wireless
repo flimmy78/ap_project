@@ -12,14 +12,14 @@ config wifi-iface
         option device   radio0
         option network  v1
         option mode     ap
-        option ssid     'gs-9797168.com'
+        option ssid     'at.com'
         option encryption none
 
 config wifi-iface
         option device   radio0
         option network  v2
         option mode     ap
-        option ssid     'gs-config.9797168.com'
+        option ssid     'config.at.com'
         option encryption none
 
 config wifi-device  radio1
@@ -36,5 +36,5 @@ config wifi-iface
         option device   radio1
         option network  v1
         option mode     ap
-        option ssid     'gs-5-9797168.com'
+        option ssid     'at.com'
         option encryption none

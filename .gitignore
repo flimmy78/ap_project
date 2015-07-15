@@ -11,6 +11,8 @@
 /package/openwrt-packages
 /package/capp
 /package/autelan-shell
+/files/etc/.version
+/fileno
 *.orig
 *.rej
 *~
