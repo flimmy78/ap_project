@@ -1,6 +1,6 @@
 config system
-        option hostname OpenWrt
-        option timezone UTC
+        option hostname Autelan
+        option timezone UTC-8
 
 config timeserver ntp
         list server     0.openwrt.pool.ntp.org
@@ -15,16 +15,16 @@ config led
         option name '2G'
         option sysfs 'ap147:green:wlan-2g'
         option trigger 'netdev'
-        option dev 'ath01'
-        option mode 'link'
+        option dev 'wlan0'
+        option mode 'link rx'
 
 config led
         option default '0'
         option name '5G'
         option sysfs 'ap147:green:wlan-5g'
         option trigger 'netdev'
-        option dev 'ath1'
-        option mode 'link'
+        option dev 'wlan1'
+        option mode 'link rx'
 
 config led
         option interval '50'
@@ -32,26 +32,12 @@ config led
         option name 'lan2'
         option sysfs 'ap147:green:lan2'
         option trigger 'switch0'
-        option port_mask '0x10'
+        option port_mask '0x4'
 
-config led 'led_usb'
+config led
         option interval '50'
         option name 'lan1'
         option sysfs 'ap147:green:lan1'
         option default '0'
         option trigger 'switch0'
-        option port_mask '0x8'
-
-config led
-        option default '0'
-        option name 'lan4'
-        option sysfs 'ap147:green:lan4'
-        option trigger 'switch0'
-        option port_mask '0x04'
-
-config led
-        option default '0'
-        option name 'lan3'
-        option sysfs 'ap147:green:lan3'
-        option trigger 'switch0'
-        option port_mask '0x02'
+        option port_mask '0x2'
