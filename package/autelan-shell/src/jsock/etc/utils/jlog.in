@@ -228,12 +228,17 @@ jdebug_KVs() {
 
 __test_jlog() {
 	jerror_kvs kvs \
-		name sb \
+		this-is-a-bool:b true \
+		this-is-a-number:number 123456789 \
+		this-is-a-string:s asdflkasdflkj \
 		obj '{"name":"SB"}' \
 		big '{"name":"DSB","obj":{"name":"SB"}}' \
 		#end
 
 	jerror_KVs KVs \
+		name/this-is-a-bool:b true \
+		name/this-is-a-number:number 123456789 \
+		name/this-is-a-string:s asdflkasdflkj \
 		name/name1/name2 sb \
 		name/obj1/obj2 '{"name":"SB"}' \
 		name/big1/big2 '{"name":"DSB","obj":{"name":"SB"}}' \

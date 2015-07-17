@@ -6,13 +6,33 @@ if [[ -z "${__UTILS_LIST_IN__}" ]]; then __UTILS_LIST_IN__=_; else return; fi
 #$1:value
 #$2:list...
 #
-in_list_check() {
+is_in_list() {
 	local value=" $1 "; shift
 	local list=" $* "
 
 	if [[ "${list}" == "${list//${value}}" ]]; then
-		return ${e_noexist}
+		echo no
+	else
+		echo yes
 	fi
+}
+
+#
+#$1:value
+#$2:list name
+#
+in_list_check() {
+        local var_value=$1
+        local var_list_name=$2
+        local var
+
+        for var in ${!var_list_name}; do
+                if [ "${var_value}" == "${var}" ]; then
+                        return 0
+                fi
+        done
+
+        return ${e_inval}
 }
 
 list_cons() {
@@ -46,6 +66,20 @@ list_first() {
 
 list_tail() {
 	shift; echo "$@"
+}
+
+#
+#for v1
+#
+get_list_first() {
+	list_first "$@"
+}
+
+#
+#for v1
+#
+get_list_tail() {
+	list_tail "$@"
 }
 
 list_head() {

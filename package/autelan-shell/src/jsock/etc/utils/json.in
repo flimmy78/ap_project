@@ -34,24 +34,24 @@ __json_eq() {
 	local a="$1"
 	local b="$2"
 
-	local keys=$(echo ${a} | jq -j 'keys') || return $?
+	local keys=$(echo ${a} | jq -j -c 'keys') || return $?
 	__json_debug "__json_eq:keys:${keys}"
 
-	local count=$(echo ${keys} | jq -j '.|length')
+	local count=$(echo ${keys} | jq -j -c '.|length')
 	__json_debug "__json_eq:count:${count}"
 
 	local i
 	for ((i=0; i<count; i++)); do
-		local name=$(echo ${keys} | jq -j ".[${i}]")
+		local name=$(echo ${keys} | jq -j -c ".[${i}]")
 		__json_debug "__json_eq:name:${name}"
 
-		local type=$(echo ${a} | jq -j ".${name} | type")
+		local type=$(echo ${a} | jq -j -c ".${name} | type")
 		__json_debug "__json_eq:type:${type}"
 
-		local va=$(echo ${a} | jq -j ".${name} | ${type}s")
+		local va=$(echo ${a} | jq -j -c ".${name} | ${type}s")
 		__json_debug "__json_eq:va:${va}"
 
-		local vb=$(echo ${b} | jq -j ".${name} | ${type}s")
+		local vb=$(echo ${b} | jq -j -c ".${name} | ${type}s")
 		__json_debug "__json_eq:vb:${vb}"
 
 		case ${type} in
@@ -109,7 +109,7 @@ json_merge() {
 	elif [[ -z "${b}" ]]; then
 		echo "${a}"
 	else
-		echo "${a}" | jq -j ". * ${b}"
+		echo "${a}" | jq -j -c ". * ${b}"
 	fi
 }
 
@@ -261,7 +261,7 @@ __json_create_bylv_reversed() {
 #$2:value
 #   value(maybe a json)
 #
-# json_create_bylo "a b c" "value"
+# json_create_bylv "a b c" "value"
 #   ==>
 # {"a":{"b":{"c":"value"}}}
 #
@@ -346,15 +346,15 @@ __json_to_aa() {
 	local aa="$2"; shift 2
 	local json="$*"
 
-	local keys=$(echo ${json} | jq -j 'keys') || return $?
-	local count=$(echo ${keys} | jq -j '.|length')
+	local keys=$(echo ${json} | jq -j -c 'keys') || return $?
+	local count=$(echo ${keys} | jq -j -c '.|length')
 	local path
 
 	local i
 	for ((i=0; i<count; i++)); do
-		local name=$(echo ${keys} | jq -j ".[${i}]")
-		local type=$(echo ${json} | jq -j ".${name} | type")
-		local value=$(echo ${json} | jq -j ".${name} | ${type}s")
+		local name=$(echo ${keys} | jq -j -c ".[${i}]")
+		local type=$(echo ${json} | jq -j -c ".${name} | type")
+		local value=$(echo ${json} | jq -j -c ".${name} | ${type}s")
 
 		if [[ "_" == "${base}" ]]; then
 			path="${name}"

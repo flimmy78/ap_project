@@ -21,6 +21,18 @@ jsock_reply() {
 	echo "${json}"
 }
 
+jsock_cb_body_handle() {
+	local input="$*"
+
+	#
+	# result handle
+	
+	local output=$(echo "${input}" | base64 | awk 'NR>1&&/:/{print ""}{printf $0}END{print ""}')
+
+	echo "${output}"
+}
+
+
 #
 #$1:errno
 #$2:stdout
@@ -30,7 +42,9 @@ jsock_cb_body() {
 	local errno="$1"
 	local stdout="$2"
 	local stderr="$3"
-
+	stdout=$(jsock_cb_body_handle "${stdout}")
+	stderr=$(jsock_cb_body_handle "${stderr}")
+	
 	echo "{\"errno\":\"${errno}\",\"stdout\":\"${stdout}\",\"stderr\":\"${stderr}\"}"
 }
 
@@ -137,6 +151,22 @@ jsock_cb() {
 	fi
 
 	return ${errno}
+}
+
+#
+#$1:input
+#
+jcmd_result_handle() {
+	local input="$*"
+
+	#
+	# result handle
+	#
+	local substring="#012"
+	local repstring=""
+	local output=${input//${substring}/${repstring}}
+
+	echo "${output}"
 }
 
 #
