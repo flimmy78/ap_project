@@ -8,7 +8,7 @@ if [[ -z "${__UTILS_DIR_IN__}" ]]; then __UTILS_DIR_IN__=_; else return; fi
 # upgrade file
 #
 readonly file_ap=sysupgrade.bin
-readonly file_ap_long=openwrt-ar71xx-generic-db120-squashfs-sysupgrade.bin
+readonly file_ap_long=openwrt-ar71xx-generic-ap147-16M-squashfs-sysupgrade.bin
 readonly file_ap_boot=u-boot.bin
 readonly file_boot=fastboot-burn.bin
 readonly file_kernel=hi_kernel.bin
@@ -266,4 +266,10 @@ setup_dir_default() {
 	setup_dir_byprefix dir_sd
 	setup_dir_byprefix dir_tmp_log
 	setup_dir_byprefix dir_tftp
+	# link ap file(for ap super recover)
+	#
+	LN_FILE ${dir_rootfs0}/image/${file_ap} ${dir_tftp}/${file_ap_long}
+	#
+	# link ap file(for ap upgrade)
+	LN_FILE ${__ROOTFS__}/image/${file_ap} ${dir_tftp_version}/${file_ap}
 }
