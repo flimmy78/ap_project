@@ -3,7 +3,7 @@
 set_ap_mac()
 {
 	local err=0
-	local mdmac=$(/usr/sbin/get_sysinfo mac)
+	local mdmac=$(/etc/jsock/jcmd.sh syn /usr/sbin/get_sysinfo mac)
 	local apmac=$(/usr/bin/partool -part mtd7 -show product.mac)
 	
 	if [[ "${apmac}" != "${mdmac}" ]] ;then
