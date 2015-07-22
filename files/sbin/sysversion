@@ -1,0 +1,8 @@
+#!/bin/bash
+
+main()
+{
+	cat /etc/.version
+}
+
+main "$@"
