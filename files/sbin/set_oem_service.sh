@@ -1,6 +1,6 @@
 #!/bin/bash
 
-. /sbin/autelan_functions.sh
+. /sbin/autelan_functions.in
 
 get_part_mtd7() {
 	local ssid=""
@@ -51,7 +51,7 @@ check_wireless_ssid() {
 
 	if [[ ${operation} -eq 1 ]]; then
 		echo "need commit & reload"
-		commit_option_value ${string_service}
+		#commit_option_value ${string_service}
 	fi
 	rm ${tmp}
 	
@@ -66,10 +66,7 @@ main() {
 	check_wireless_ssid; operation2=$?
 
 	if [[ ${operation2} -eq 1 ]]; then
-
-		/etc/init.d/network reload
-		sleep 10
-		return 0
+		wifi down; wifi up
 	fi
 	return 1
 }
