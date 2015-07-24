@@ -9,10 +9,10 @@ DEBUG_LOG_LOCAL=/dev/null
 #
 # default custom parameters
 #
-readonly DEF_SSID1=9797168.com
+readonly DEF_SSID1=at.com
 readonly DEF_SSID0=config.${DEF_SSID1}
-readonly DEF_LMS=atbus.autelan.com
-readonly DEF_PORTAL=9797168.com
+readonly DEF_LMS=lms1.autelan.com
+readonly DEF_PORTAL=at.com
 readonly OEM_MD_FLAG=/tmp/.oem_md.json
 
 #
