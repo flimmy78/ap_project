@@ -3,7 +3,7 @@
 main() {
 	local err=0;
 
-	eval "$@ &> /dev/null"; err=$?
+	eval "($@) &> /dev/null"; err=$?
 
 	echo ${err}
 
