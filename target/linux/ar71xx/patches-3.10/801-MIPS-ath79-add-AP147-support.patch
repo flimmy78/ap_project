@@ -88,8 +88,8 @@ diff -Nuar a/arch/mips/ath79/dev-eth.c b/arch/mips/ath79/dev-eth.c
  			break;
 diff -Nuar a/arch/mips/ath79/dev-wmac.c b/arch/mips/ath79/dev-wmac.c
 --- a/arch/mips/ath79/dev-wmac.c	2015-06-19 16:22:09.000000000 +0800
-+++ b/arch/mips/ath79/dev-wmac.c	2015-06-19 16:47:39.000000000 +0800
-@@ -157,8 +157,8 @@
++++ b/arch/mips/ath79/dev-wmac.c	2015-08-14 15:32:07.000000000 +0800
+@@ -157,13 +157,15 @@
  
  	ath79_wmac_resources[0].start = QCA953X_WMAC_BASE;
  	ath79_wmac_resources[0].end = QCA953X_WMAC_BASE + QCA953X_WMAC_SIZE - 1;
@@ -99,8 +99,15 @@ diff -Nuar a/arch/mips/ath79/dev-wmac.c b/arch/mips/ath79/dev-wmac.c
 +	ath79_wmac_resources[1].start = ATH79_IP2_IRQ(1);
  
  	t = ath79_reset_rr(QCA953X_RESET_REG_BOOTSTRAP);
++/**
  	if (t & QCA953X_BOOTSTRAP_REF_CLK_40)
-@@ -280,7 +280,7 @@
+ 		ath79_wmac_data.is_clk_25mhz = false;
+ 	else
++**/
+ 		ath79_wmac_data.is_clk_25mhz = true;
+ 
+ 	ath79_wmac_data.get_mac_revision = ar93xx_get_soc_revision;
+@@ -280,7 +282,7 @@
  	u8 mac[6] = { 0x00, 0x02, 0x03, 0x04, 0x05, 0x06 };
  	int mac_start = 2, mac_end = 8;
  
