@@ -133,7 +133,7 @@ __jsock_json() {
 __jsock_check_mode() {
 	local mode=$1
 
-	in_list_check "${mode}" ${list_jsock_mode} || {
+	in_list_check "${mode}" list_jsock_mode || {
 		return ${e_jsock_bad_mode}
 	}
 }
@@ -144,7 +144,7 @@ __jsock_check_mode() {
 __jsock_check_type() {
 	local type=$1
 
-	in_list_check "${type}" ${list_jsock_type} || {
+	in_list_check "${type}" list_jsock_type || {
 		return ${e_jsock_bad_type}
 	}
 }
@@ -193,12 +193,12 @@ jsock_handle() {
 
 	local stdout="$(echo ${body} | jq -j '.stdout|strings')"
 	if [[ -n "${stdout}" ]]; then
-		echo "${stdout}"
+		echo "${stdout}" | base64 -d
 	fi
 
 	local stderr="$(echo ${body} | jq -j '.stderr|strings')"
 	if [[ -n "${stderr}" ]]; then
-		echo "${stderr}" >&2
+		echo "${stderr}" | base64 -d >&2
 	fi
 }
 

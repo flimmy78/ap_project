@@ -1,10 +1,18 @@
 # Put your custom commands here that should be executed once
 # the system init finished. By default this file does nothing.
 
+# ap syslogd
+/bin/mkdir -p /root/log/init
+/bin/mkdir -p /root/log/ulog
+dmesg_syslogd.sh &
+
 # create the path of tftp
 mkdir /tmp/tftp
 
 # stimerd
 /usr/bin/stimerd &
+
+# this is upload OFF&VCC log
+/sbin/upload_tftp.sh &
 
 exit 0

@@ -1,0 +1,41 @@
+#!/bin/bash
+
+AP_LED_PATH=/sys/devices/platform/leds-gpio/leds
+AP_LED_BRIGHTNESS=brightness
+
+help() {
+	echo "usage: led_ctrl [on|off]"
+	exit
+}
+
+compare_led() {
+	local value="$1"
+	local key=ap147:green:
+	local ap_led=('wlan-2g' 'wlan-5g' 'lan1' 'lan2')
+	local count=${#ap_led[*]}
+
+	for ((i=0; i<count; i++)); do
+		[[ -z ${ap_led[$i]} ]] && break
+		[[ "${key}${ap_led[$i]}" = "${value}" ]] && return 0
+	done
+	return 1
+}
+
+main() {
+	local operate=$1
+	local path=${AP_LED_PATH}/${AP_LED_STRING}
+	
+	[[ ${operate} != "on" && ${operate} != "off" ]] && help
+
+	local dir
+	local err
+	for dir in $(ls ${AP_LED_PATH} | sort -r); do
+		compare_led "${dir}"; err=$?
+		[[ ${err} != 0 ]] && continue
+		echo "led: ${dir}"
+		[[ ${operate} != "off" ]] && echo 1 > ${AP_LED_PATH}/${dir}/${AP_LED_BRIGHTNESS}
+		[[ ${operate} != "on" ]] && echo 0 > ${AP_LED_PATH}/${dir}/${AP_LED_BRIGHTNESS}
+	done
+}
+
+main "$@"
