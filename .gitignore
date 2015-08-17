@@ -10,6 +10,7 @@
 /logs
 /package/openwrt-packages
 /package/capp
+/package/autelan-shell/src/jsock
 /files/etc/.version
 /fileno
 *.orig
