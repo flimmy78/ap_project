@@ -109,7 +109,7 @@ tftp_initlog() {
 
 	for file in $(ls ${LOCAL_ROOT_PATH} |grep ${STRING})
 	do
-		tftp_RtoM ${LOCAL_ROOT_PATH} ${PEER_TMP_PATH} ${PEER_OPT_PATH} ${PEER} ${file} ${file}
+		tftp_RtoM ${LOCAL_ROOT_PATH} ${PEER_TMP_PATH} ${PEER_OPT_PATH} ${PEER} ${file} ap_${file}
 	done
 }
 
@@ -124,7 +124,7 @@ tftp_ulog() {
 
 	for file in $(ls ${LOCAL_ROOT_PATH} |grep ${STRING})
 	do
-		tftp_RtoM ${LOCAL_ROOT_PATH} ${PEER_TMP_PATH} ${PEER_OPT_PATH} ${PEER} ${file} ${file}
+		tftp_RtoM ${LOCAL_ROOT_PATH} ${PEER_TMP_PATH} ${PEER_OPT_PATH} ${PEER} ${file} ap_${file}
 	done
 }
 
