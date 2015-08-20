@@ -24,6 +24,7 @@ autelan_func() {
                 cat "$PRODUCT_INFO"
         else
                 local mac=$(/usr/bin/partool -part mtd7 -show product.mac | sed 's/://g')
+		[[ "${mac}" = "product.mac not exist" ]] && mac="001F64000001"
                 local mac_1=` echo $mac | awk -F '' '{print $1$2$3$4$5$6}' `
                 local mac_2=` echo $mac | awk -F '' '{print $7$8$9$10$11$12}' `
                 local mac0="$mac_1""$(awk 'BEGIN{printf("%06x",'0x$mac_2'+'0x000002')}')"
